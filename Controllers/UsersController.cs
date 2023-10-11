@@ -1,14 +1,13 @@
 ﻿using API.DbEntities;
+using API.DbEntities.DTOs;
 using API.Services.Definition;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
 
 namespace API.Controllers
 {
-    [Route("[controller]")]
-    [ApiController]
-    public class UsersController : ControllerBase
+    [Authorize]
+    public class UsersController : BaseApiController
     {
         private readonly IUserService _userService;
         public UsersController(IUserService userService)
@@ -35,6 +34,21 @@ namespace API.Controllers
             {
                 return taskResult;
             }
+        }
+
+        [HttpPost("Register")]
+        public async Task<UserResponseDTO> Register([FromBody] UserDTO user)
+        {
+            var taskResult = await _userService.Register(user);
+            return taskResult;
+        }
+
+        [AllowAnonymous]
+        [HttpPost("Login")]
+        public async Task<UserResponseDTO> Login([FromBody] LoginDTO login)
+        {
+            var taskResult = await _userService.Login(login);
+            return taskResult;
         }
     }
 }

@@ -1,27 +1,10 @@
-using API.DatabaseContext;
-using API.Repository.Definition;
-using API.Repository.Implementation;
-using API.Services.Definition;
-using API.Services.Implementation;
-using Microsoft.EntityFrameworkCore;
+using API.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-builder.Services.AddCors();
-
-
-//--------Add Repository-----------------------------------------
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-//----------Add Service------------------------------------------
-builder.Services.AddScoped<IUserService, UserService>();
-//---------------------------------------------------------------
+builder.Services.AddServices(builder.Configuration);
+builder.Services.AddIdentityServices(builder.Configuration);
 
 var app = builder.Build();
 
@@ -35,6 +18,7 @@ app.UseCors(builder => builder.AllowAnyHeader().AllowAnyMethod().WithOrigins("ht
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
