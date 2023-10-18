@@ -15,6 +15,7 @@ namespace API.Controllers
             _userService = userService;
         }
         [HttpGet("GetUsers")]
+        [AllowAnonymous]
         public async Task<ActionResult<List<AppUser>>> GetUsers()
         {
             var taskResult = await _userService.GetUsers();
@@ -37,6 +38,7 @@ namespace API.Controllers
         }
 
         [HttpPost("Register")]
+        [AllowAnonymous]
         public async Task<UserResponseDTO> Register([FromBody] UserDTO user)
         {
             var taskResult = await _userService.Register(user);
@@ -52,3 +54,4 @@ namespace API.Controllers
         }
     }
 }
+ 
