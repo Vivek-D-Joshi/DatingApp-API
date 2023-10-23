@@ -2,8 +2,7 @@
 using API.DbEntities.DTOs;
 using API.Repository.Definition;
 using API.Services.Definition;
-using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
+using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -30,7 +29,7 @@ namespace API.Services.Implementation
             var response = new UserResponseDTO();
             if (await _userRepository.IsUserExist(request))
             {
-                response.Status = "400";
+                response.Status = HttpStatusCode.BadRequest;
                 response.Description = "Record already exist";
             }
             else
@@ -49,13 +48,13 @@ namespace API.Services.Implementation
                 var result = await _userRepository.AddUser(user);
                 if (result > 0)
                 {
-                    response.Status = "200";
+                    response.Status = HttpStatusCode.OK;
                     response.Description = "Record added successfully";
                     response.Token = _tokenService.CreateToken(user);
                 }
                 else
                 {
-                    response.Status = "400";
+                    response.Status = HttpStatusCode.BadRequest;
                     response.Description = "Failed to add record";
                 }
             }
@@ -68,7 +67,7 @@ namespace API.Services.Implementation
             var user = await this._userRepository.GetUser(request);
             if(user == null)
             {
-                response.Status = "400";
+                response.Status = HttpStatusCode.BadRequest;
                 response.Description = "Invalid Username";
             }
             else
@@ -80,12 +79,12 @@ namespace API.Services.Implementation
                 {
                     if (user.PasswordHash[i] != computedHash[i])
                     {
-                        response.Status = "400";
+                        response.Status = HttpStatusCode.BadRequest;
                         response.Description = "Invalid Password";
                         return response;
                     }
                 }
-                response.Status = "200";
+                response.Status = HttpStatusCode.OK;
                 response.Description = "Login successful";
                 response.Token = _tokenService.CreateToken(user);
             }

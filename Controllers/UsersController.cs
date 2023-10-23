@@ -3,6 +3,7 @@ using API.DbEntities.DTOs;
 using API.Services.Definition;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace API.Controllers
 {
@@ -19,7 +20,15 @@ namespace API.Controllers
         public async Task<ActionResult<List<AppUser>>> GetUsers()
         {
             var taskResult = await _userService.GetUsers();
-            return taskResult;
+            if(taskResult.Count == 0)
+            {
+                var emptyResult = new EmptyResult();
+                return emptyResult;
+            }
+            else
+            {
+                return taskResult;
+            }
         }
 
         [HttpGet("GetUsers/{id}")]
@@ -39,18 +48,32 @@ namespace API.Controllers
 
         [HttpPost("Register")]
         [AllowAnonymous]
-        public async Task<UserResponseDTO> Register([FromBody] UserDTO user)
+        public async Task<IActionResult> Register([FromBody] UserDTO user)
         {
             var taskResult = await _userService.Register(user);
-            return taskResult;
+            if(taskResult.Status == HttpStatusCode.BadRequest)
+            {
+                return BadRequest(taskResult.Description);
+            }
+            else
+            {
+                return Ok(taskResult);
+            }
         }
 
         [AllowAnonymous]
         [HttpPost("Login")]
-        public async Task<UserResponseDTO> Login([FromBody] LoginDTO login)
+        public async Task<IActionResult> Login([FromBody] LoginDTO login)
         {
             var taskResult = await _userService.Login(login);
-            return taskResult;
+            if(taskResult.Status == HttpStatusCode.BadRequest)
+            {
+                return Unauthorized(taskResult.Description);
+            }
+            else
+            {
+                return Ok(taskResult);
+            }
         }
     }
 }
